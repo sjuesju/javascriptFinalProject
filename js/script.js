@@ -1,28 +1,64 @@
 $("#btn").on("click", function(){
 	let gameObject = {gameboard:$('#gameboard').val(), cell:$('#cell').val(), direction:$('#direction').val()};
+	addGameboardBordersToObject(gameObject);
+
 	if (checkForEmptyInputs(gameObject) == false){
 		return false;
 	}
 	// php validation
 	if (checkIsMoveWithinArray(gameObject) == false){
+		$('#userInputForm').before('<p class="error">Your move is outside of the border</p>');
 		return false;
 	}
-
 });
 
 $("#gameboard").on("input", checkForCorrectlyAddedGameboard);
 $("#cell").on("input", checkForCorrectlyAddedCell);
 $("#direction").on("input", checkForCorrectlyAddedDirection);
 
-function checkIsMoveWithinArray(gameObject){
-	let arraySize = getArraySize(gameObject.gameboard);
+function addGameboardBordersToObject(gameObject){
+	gameObject['currentYPosition'] = returnCurrentYPosition(gameObject.cell);
+	gameObject['currentXPosition'] = returnCurrentXPosition(gameObject.cell);
+	gameObject['maxYPosition'] = returnMaxYPosition(gameObject.gameboard);
+	gameObject['maxXPosition'] = returnMaxXPosition(gameObject.gameboard);
 }
 
-function getArraySize(gameboard){
-	let splittedGameboard = gameboard.split('['), splittedGameboardElement = splittedGameboard[2].split(','), final = [];
-	final.push(splittedGameboard.length - 2);
-	final.push(splittedGameboardElement.length - 1);
-	return final;
+function returnCurrentYPosition(cell){
+	let splitted = cell.split(',');
+	return splitted[0].replace('[', '').trim();
+}
+
+function returnCurrentXPosition(cell){
+	let splitted = cell.split(',');
+	return splitted[1].replace(']', '').trim();
+} 
+
+function returnMaxYPosition(gameboard){
+	let splittedGameboard = gameboard.split('[');
+	return splittedGameboard.length - 3;
+}
+
+function returnMaxXPosition(gameboard){
+	let splittedGameboard = gameboard.split('['), splittedGameboardElement = splittedGameboard[2].split(',');
+	return splittedGameboardElement.length - 2;
+}
+
+function checkIsMoveWithinArray(gameObject){
+	if (gameObject.direction == 'U'){
+		gameObject.currentYPosition--;
+	} else if(gameObject.direction == 'R'){
+		gameObject.currentXPosition++;
+	} else if(gameObject.direction == 'D'){
+		gameObject.currentYPosition++;
+	} else if(gameObject.direction == 'L'){
+		gameObject.currentXPosition--;
+	} 
+
+	if (gameObject.currentXPosition < 0 || gameObject.currentYPosition < 0 || gameObject.currentXPosition > gameObject.maxXPosition || gameObject.currentYPosition > gameObject.maxYPosition){
+		return false;
+	} else {
+		return true;
+	}
 }
 
 function checkForCorrectlyAddedDirection(){

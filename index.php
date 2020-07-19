@@ -48,7 +48,7 @@
  candyCrush2(gameboard, cell, direction) = false.
 	</p>
 
-	<form method="post">
+	<form method="post" id="userInputForm">
 		<div>
 			Insert gameboard: <input type="text" name="gameboard" id="gameboard">
 		</div>
