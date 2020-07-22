@@ -1,15 +1,29 @@
 $("#btn").on("click", function(){
 	let gameObject = {gameboard:$('#gameboard').val(), cell:$('#cell').val(), direction:$('#direction').val()};
-	addGameboardBordersToObject(gameObject);
 
 	if (checkForEmptyInputs(gameObject) == false){
 		return false;
-	}
-	// php validation
+	}	
+
+	addGameboardBordersToObject(gameObject);
+
 	if (checkIsMoveWithinArray(gameObject) == false){
 		$('#userInputForm').before('<p class="error">Your move is outside of the border</p>');
 		return false;
 	}
+
+	$.ajax({
+		url: './script.php',
+		type: 'post',
+		data: 'gameboard=' + gameObject.gameboard + '&cell=' + gameObject.cell + '&direction=' + gameObject.direction,
+		dataType: 'json',
+		success: function(response){
+			console.log(response);			
+		}, 
+		error: function(xhr, ajaxOptions, thrownError){
+			console.log(thrownError)
+		}
+	});
 });
 
 $("#gameboard").on("input", checkForCorrectlyAddedGameboard);
