@@ -60,6 +60,7 @@
 		<div>
 		<input type="button" name="btn" id="btn" value="Go">
 	</form>
+	<p id="answer">
 <script src="js/script.js"></script>
 </body>
 </html>

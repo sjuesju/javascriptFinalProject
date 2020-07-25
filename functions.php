@@ -11,6 +11,13 @@
 			}
 		}
 
+		for ($i=0; $i < $lenX; $i++) { 
+			for ($row=1; $row < $lenY - 1; $row++) { 
+				if ($gameboard_array[$row][$i] == $gameboard_array[$row - 1][$i] && $gameboard_array[$row][$i] == $gameboard_array[$row + 1][$i]){
+					return true;
+				}
+			}
+		}
 		
 		return false;
 	}

@@ -1,4 +1,6 @@
 $("#btn").on("click", function(){
+	$('.error').remove();
+	$('.success').remove();
 	let gameObject = {gameboard:$('#gameboard').val(), cell:$('#cell').val(), direction:$('#direction').val()};
 
 	if (checkForEmptyInputs(gameObject) == false){
@@ -11,14 +13,17 @@ $("#btn").on("click", function(){
 		$('#userInputForm').before('<p class="error">Your move is outside of the border</p>');
 		return false;
 	}
-
 	$.ajax({
 		url: './script.php',
 		type: 'post',
 		data: 'gameboard=' + gameObject.gameboard + '&cell=' + gameObject.cell + '&direction=' + gameObject.direction,
 		dataType: 'json',
 		success: function(response){
-			console.log(response);			
+			if (response.gameboard_error){
+					$('#userInputForm').before('<p class="error">Incorrect gameboard! Please try again!</p>');
+			} else {
+				$('#userInputForm').before('<p class="success">' + response + '</p>');
+			}			
 		}, 
 		error: function(xhr, ajaxOptions, thrownError){
 			console.log(thrownError)
@@ -76,7 +81,7 @@ function checkIsMoveWithinArray(gameObject){
 }
 
 function checkForCorrectlyAddedDirection(){
-	let direction = $('#direction'), directionInput = removeEmptyElementsInInputReturnString(direction.val());
+	let direction = $('#direction'), directionInput = removeEmptyElementsInInputReturnString(direction.val()).replaceAll("'", '');
 	if (directionInput == 'R' || directionInput == 'L' || directionInput == 'U' || directionInput == 'D'){
 			direction.css('border-color', 'green');
 	} else {
@@ -108,7 +113,7 @@ function isCellInputOk(cellInput){
 }
 
 function removeEmptyElementsInInput(input){
-	let temp = input.split(''), len = input.length, final = [];
+	let temp = input.replaceAll('"', "'").split(''), len = input.length, final = [];
 	for (var i = 0; i < len; i++) {
 		if (temp[i].trim().length > 0){
 			final.push(temp[i]);
@@ -118,7 +123,7 @@ function removeEmptyElementsInInput(input){
 }
 
 function removeEmptyElementsInInputReturnString(input){
-	let temp = input.split(''), len = input.length, final = "";
+	let temp = input.replaceAll('"', "'").split(''), len = input.length, final = "";
 	for (var i = 0; i < len; i++) {
 		if (temp[i].trim().length > 0){
 			final += temp[i];
