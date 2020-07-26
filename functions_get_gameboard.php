@@ -2,11 +2,11 @@
 	include 'functions.php';
 
 	function get_gameboard_array(){
-		if (checkForCorrectlyAddedGameboard($_POST['gameboard']) == false){
+		$clean_gameboard = remove_empty_from_string($_POST['gameboard']);
+		if (checkForCorrectlyAddedGameboard($clean_gameboard) == false){
 			return false;
 		}
-		$gameboard_array = [];
-		$clean_gameboard = remove_empty_from_string($_POST['gameboard']);		
+		$gameboard_array = [];				
 		$final_array = getMultiDimencialArray($clean_gameboard);
 		
 		return $final_array;
@@ -94,7 +94,7 @@
 		if ($len == 0){
 			return true;
 		}
-		$numberOfElements = comaCounter[0];
+		$numberOfElements = $comaCounter[0];
 		for ($i = 1; $i < $len; $i++) {
 			if ($comaCounter[$i] != $numberOfElements){
 				return false;

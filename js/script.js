@@ -20,7 +20,11 @@ $("#btn").on("click", function(){
 		dataType: 'json',
 		success: function(response){
 			if (response.gameboard_error){
-					$('#userInputForm').before('<p class="error">Incorrect gameboard! Please try again!</p>');
+				$('#userInputForm').before('<p class="error">' + response.gameboard_error + '</p>');
+			} else if (response.cell_error){
+				$('#userInputForm').before('<p class="error">' + response.cell_error + '</p>');
+			} else if (response.direction_error){
+				$('#userInputForm').before('<p class="error">' + response.direction_error + '</p>');
 			} else {
 				$('#userInputForm').before('<p class="success">' + response + '</p>');
 			}			
