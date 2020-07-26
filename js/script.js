@@ -1,6 +1,7 @@
 $("#btn").on("click", function(){
 	$('.error').remove();
 	$('.success').remove();
+	$('#visualization').remove();
 	let gameObject = {gameboard:$('#gameboard').val(), cell:$('#cell').val(), direction:$('#direction').val()};
 
 	if (checkForEmptyInputs(gameObject) == false){
@@ -13,6 +14,7 @@ $("#btn").on("click", function(){
 		$('#userInputForm').before('<p class="error">Your move is outside of the border</p>');
 		return false;
 	}
+
 	$.ajax({
 		url: './script.php',
 		type: 'post',
@@ -25,8 +27,17 @@ $("#btn").on("click", function(){
 				$('#userInputForm').before('<p class="error">' + response.cell_error + '</p>');
 			} else if (response.direction_error){
 				$('#userInputForm').before('<p class="error">' + response.direction_error + '</p>');
+			} else if (response.wrong_move){
+				$('#userInputForm').before('<p class="error">' + response.wrong_move + '</p>');
+			} else if (response.catch_error){
+				$('#userInputForm').before('<p class="error">' + response.catch_error + '</p>');
 			} else {
-				$('#userInputForm').before('<p class="success">' + response + '</p>');
+				if (response[0] == true){
+					$('#userInputForm').before('<p class="success">There is Candy Crush</p>');
+				} else {
+					$('#userInputForm').before('<p class="error">No Candy Crush Here</p>');
+				}
+				visualizeGameboards(response);
 			}			
 		}, 
 		error: function(xhr, ajaxOptions, thrownError){
@@ -38,6 +49,56 @@ $("#btn").on("click", function(){
 $("#gameboard").on("input", checkForCorrectlyAddedGameboard);
 $("#cell").on("input", checkForCorrectlyAddedCell);
 $("#direction").on("input", checkForCorrectlyAddedDirection);
+
+function visualizeGameboards(response){
+	$('#userInputForm').after('<div id="visualization"></div>');
+	visualizeGameboard(response[1], 'tableFirst', response[3]);
+	visualizeGameboard(response[2], 'tableSecond', response[3]);
+}
+
+function visualizeGameboard(gameboard, id, candyCrushCells){
+	let html = '', len = gameboard.length, candyCrushCellsArray = returnCandyCrushCellsArray(candyCrushCells);
+	html += '<table id="' + id + '" class="showGameboard"><th colspan=' + len + '>' + id + '</th>';
+	for (var i = 0; i < len; i++) {
+		let innerLen = gameboard[i].length;
+		html += '<tr>';
+		for (var el = 0; el < innerLen; el++) {
+			let candyCrushCellsLength = candyCrushCellsArray.length, candyCrushFound = false;
+			if (id == "tableSecond"){
+				for (var ccc = 0; ccc < candyCrushCellsLength; ccc++) {
+					let y = parseInt(candyCrushCellsArray[ccc][0], 10), x = parseInt(candyCrushCellsArray[ccc][1], 10);				
+					if (y == i && x == el){
+						candyCrushFound = true;
+						break;
+					}
+				}
+				if (candyCrushFound == true){
+					html += '<td><div class="color' + gameboard[i][el] + ' borderRed"></div></td>';
+					console.log('fdfdfd');
+				} else {
+					html += '<td><div class="color' + gameboard[i][el] + '"></div></td>';
+				}
+			} else {
+				html += '<td><div class="color' + gameboard[i][el] + '"></div></td>';
+			}		
+		}
+		html += '</tr>';
+	}
+	html += '</table>';
+	$('#visualization').append(html);
+}
+
+function returnCandyCrushCellsArray(candyCrushCells){
+	let len = candyCrushCells.length, finalArray = [];
+	for (var i = 0; i < len; i++) {
+		let innerLen = candyCrushCells[i].length;
+		for (var el = 0; el < innerLen; el++) {
+			tempArray = candyCrushCells[i][el].split('|');
+			finalArray.push(tempArray);
+		}
+	}
+	return finalArray;
+}
 
 function addGameboardBordersToObject(gameObject){
 	gameObject['currentYPosition'] = returnCurrentYPosition(gameObject.cell);

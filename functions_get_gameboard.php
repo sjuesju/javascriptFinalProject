@@ -2,7 +2,7 @@
 	include 'functions.php';
 
 	function get_gameboard_array(){
-		$clean_gameboard = remove_empty_from_string($_POST['gameboard']);
+		$clean_gameboard = str_replace('"', "'", remove_empty_from_string($_POST['gameboard']));
 		if (checkForCorrectlyAddedGameboard($clean_gameboard) == false){
 			return false;
 		}
